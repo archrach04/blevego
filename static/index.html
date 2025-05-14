@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Search</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background-color: #f4f4f9;
+        }
+        input[type="text"] {
+            padding: 8px;
+            width: 300px;
+            font-size: 14px;
+        }
+        button {
+            padding: 8px 16px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+        .results {
+            margin-top: 20px;
+        }
+        .result-item {
+            margin-bottom: 10px;
+            padding: 10px;
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Search Products</h1>
+    <input type="text" id="searchQuery" placeholder="Enter product name...">
+    <button onclick="searchProducts()">Search</button>
+
+    <div class="results" id="results"></div>
+
+    <script>
+        async function searchProducts() {
+            const query = document.getElementById('searchQuery').value;
+            if (!query) {
+                alert('Please enter a search query.');
+                return;
+            }
+
+            try {
+                const response = await fetch(`http://localhost:8080/search?q=${encodeURIComponent(query)}`);
+                const results = await response.json();
+                
+                const resultsContainer = document.getElementById('results');
+                resultsContainer.innerHTML = '';
+
+                if (results.length === 0) {
+                    resultsContainer.innerHTML = '<p>No results found.</p>';
+                    return;
+                }
+
+                results.forEach(product => {
+                    const resultDiv = document.createElement('div');
+                    resultDiv.className = 'result-item';
+                    resultDiv.innerHTML = `
+                        <strong>${product.name}</strong><br>
+                        Category: ${product.category}<br>
+                        ID: ${product.id}
+                    `;
+                    resultsContainer.appendChild(resultDiv);
+                });
+            } catch (error) {
+                console.error('Error fetching search results:', error);
+                alert('Failed to fetch results, please try again later.');
+            }
+        }
+    </script>
+</body>
+</html>
